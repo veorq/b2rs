@@ -1,0 +1,12 @@
+[package]
+name = "b2rs"
+version = "0.1.0"
+authors = ["JP Aumasson <jeanphilippe.aumasson@gmail.com>"]
+
+[lib]
+name = "b2"
+path = "src/b2b.rs"
+
+[[bin]]
+name = "example"
+path = "src/example.rs"

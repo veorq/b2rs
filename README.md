@@ -1,2 +1,3 @@
 # b2rs
-BLAKE2 in Rust
+
+Simple BLAKE2b in Rust, non-streamable interface.
