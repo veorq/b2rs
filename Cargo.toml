@@ -1,8 +1,8 @@
 [package]
 name = "b2rs"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["JP Aumasson <jeanphilippe.aumasson@gmail.com>"]
 
 [[bin]]
-name = "example"
-path = "src/example.rs"
+name = "main"
+path = "src/main.rs"
