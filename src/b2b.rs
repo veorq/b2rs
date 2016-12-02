@@ -1,3 +1,5 @@
+use std::iter::repeat;
+
 const SIG: [[usize; 16]; 12] = [
     [ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15],
     [14, 10,  4,  8,  9, 15, 13,  6,  1, 12,  0,  2, 11,  7,  5,  3],
@@ -56,12 +58,28 @@ macro_rules!G(
     for i in 0..8 { h[i] ^= v[i] ^ v[i+8]; }
 }
 
-pub fn b2b(message: &[u8]) -> [u8; 64] {
+pub fn hash(message: &[u8]) -> Vec<u8> {
+    hash_custom(message, 64, 1, 1, 0, 0, 0, 0, 0)
+}
+
+pub fn hash_custom(message: &[u8], 
+    digest_length: u8, fanout: u8, depth: u8, 
+    leaf_length: u32, node_offset: u32, xof_length: u32, 
+    node_depth: u8, inner_length: u8
+    ) -> Vec<u8> {
 
     let mut hash = [ 
-        0x6a09e667f2bdc948, 0xbb67ae8584caa73b, 0x3c6ef372fe94f82b, 0xa54ff53a5f1d36f1,
+         0x6a09e667f3bcc908, 0xbb67ae8584caa73b, 0x3c6ef372fe94f82b, 0xa54ff53a5f1d36f1,
         0x510e527fade682d1, 0x9b05688c2b3e6c1f, 0x1f83d9abfb41bd6b, 0x5be0cd19137e2179,
     ];
+    hash[0] ^=  digest_length as u64;
+    hash[0] ^=  (fanout as u64) << 16; 
+    hash[0] ^=  (depth as u64) << 24; 
+    hash[0] ^=  (leaf_length as u64) << 32; 
+    hash[1] ^=  node_offset as u64;
+    hash[1] ^=  (xof_length as u64) << 32;
+    hash[2] ^=  node_depth as u64;
+    hash[2] ^=  (inner_length as u64) << 8;
 
     let mut t = 0u64;
     let mut data = message;
@@ -77,7 +95,7 @@ pub fn b2b(message: &[u8]) -> [u8; 64] {
     for i in 0..data.len() { block[i] = data[i]; }
     b2b_compress(&mut hash, message.len() as u64, !0, &block);
 
-    let mut digest = [0u8; 64];
+    let mut digest: Vec<u8> = repeat(0u8).take(digest_length as usize).collect();
     for i in 0..64 { digest[i] = (hash[i/8] >> (8*(i%8))) as u8; }
     digest
 }

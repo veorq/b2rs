@@ -1,4 +1,5 @@
-mod b2b;
+extern crate b2rs;
+use b2rs::b2xb;
 
 use std::env;
 
@@ -7,8 +8,8 @@ pub fn main() {
 
     let msg = args[1].as_bytes();
 
-    let hash = b2b::b2b(msg);
-    for x in hash.iter().take(64) {
-        print!("{:02x}", x);
+    let hash = b2xb::hash(msg, 256);
+    for x in &hash {
+        print!("{:02x}", *x);
     }
 }
