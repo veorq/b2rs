@@ -1,3 +1,4 @@
 # b2rs
 
-Simple BLAKE2b in Rust, non-streamable interface.
+BLAKE2b and BLAKE2Xb in Rust, non-streamable interface, experimental.
+
