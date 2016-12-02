@@ -96,6 +96,6 @@ pub fn hash_custom(message: &[u8],
     b2b_compress(&mut hash, message.len() as u64, !0, &block);
 
     let mut digest: Vec<u8> = repeat(0u8).take(digest_length as usize).collect();
-    for i in 0..64 { digest[i] = (hash[i/8] >> (8*(i%8))) as u8; }
+    for i in 0..(digest_length as usize) { digest[i] = (hash[i/8] >> (8*(i%8))) as u8; }
     digest
 }
