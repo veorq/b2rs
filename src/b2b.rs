@@ -57,25 +57,41 @@ macro_rules!G(
 }
 
 pub fn hash(message: &[u8]) -> Vec<u8> {
-    hash_custom(message, 64, 1, 1, 0, 0, 0, 0, 0)
+    hash_keyed(message, &[])
 }
 
-pub fn hash_custom(message: &[u8], digest_length: u8, fanout: u8, depth: u8, 
-    leaf_length: u32, node_offset: u32, xof_length: u32, 
+pub fn hash_keyed(message: &[u8], key: &[u8]) -> Vec<u8> {
+    hash_custom(message, key, 64, 1, 1, 0, 0, 0, 0, 0)
+}
+
+pub fn hash_custom(message: &[u8], key: &[u8], digest_length: u8,
+    fanout: u8, depth: u8, leaf_length: u32, node_offset: u32, xof_length: u32, 
     node_depth: u8, inner_length: u8
     ) -> Vec<u8> {
 
     let mut hash = [ 
-         0x6a09e667f3bcc908 ^ (digest_length as u64) ^ (fanout as u64) << 16 
-                            ^ (depth as u64) << 24 ^ (leaf_length as u64) << 32, 
-         0xbb67ae8584caa73b ^ node_offset as u64 ^ (xof_length as u64) << 32, 
-         0x3c6ef372fe94f82b ^ (node_depth as u64) ^ (inner_length as u64) << 8, 
+         0x6a09e667f3bcc908 ^ (digest_length    as u64) 
+                            ^ (key.len()        as u64) << 8
+                            ^ (fanout           as u64) << 16 
+                            ^ (depth            as u64) << 24 
+                            ^ (leaf_length      as u64) << 32, 
+         0xbb67ae8584caa73b ^ node_offset       as u64 
+                            ^ (xof_length       as u64) << 32, 
+         0x3c6ef372fe94f82b ^ (node_depth       as u64) 
+                            ^ (inner_length     as u64) << 8, 
          0xa54ff53a5f1d36f1,
          0x510e527fade682d1, 0x9b05688c2b3e6c1f, 0x1f83d9abfb41bd6b, 0x5be0cd19137e2179,
     ];
 
     let mut t = 0u64;
     let mut data = message;
+
+    if key.len() > 0 {
+        t += 128;
+        let mut block = [0u8; 128];
+        for i in 0..key.len() { block[i] = key[i]; }
+        b2b_compress(&mut hash, t, !0, &block);
+    }
 
     while data.len() > 128 {
         t += 128;
