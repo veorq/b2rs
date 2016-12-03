@@ -90,7 +90,7 @@ pub fn hash_custom(message: &[u8], key: &[u8], digest_length: u8,
         t += 128;
         let mut block = [0u8; 128];
         for i in 0..key.len() { block[i] = key[i]; }
-        b2b_compress(&mut hash, t, !0, &block);
+        b2b_compress(&mut hash, t, 0, &block);
     }
 
     while data.len() > 128 {
@@ -102,7 +102,7 @@ pub fn hash_custom(message: &[u8], key: &[u8], digest_length: u8,
 
     let mut block = [0u8; 128];
     for i in 0..data.len() { block[i] = data[i]; }
-    b2b_compress(&mut hash, message.len() as u64, !0, &block);
+    b2b_compress(&mut hash, t + data.len() as u64, !0, &block);
 
     let mut digest = Vec::new();
     for i in 0..(digest_length as usize) { digest.push((hash[i/8] >> (8*(i%8))) as u8); }
