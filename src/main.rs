@@ -1,5 +1,6 @@
 extern crate b2rs;
 use b2rs::b2xb;
+use b2rs::b2b;
 use std::env;
 
 pub fn main() {
@@ -13,5 +14,16 @@ pub fn main() {
 
     let hash = b2xb::hash(msg, length);
     for x in &hash { print!("{:02x}", *x); }
-    println!("")
+    println!("");
+
+    let mut msg = [0u8; 256];
+    for i in 0..256 { msg[i] = i as u8; }
+    let mut key = [0u8; 64];
+    for i in 0..64 { key[i] = i as u8; }
+
+    let hash = b2b::hash_keyed(&msg[..256], &key[..64]);
+
+    for x in &hash { print!("{:02x}", *x); }
+    println!("");
+
 }
